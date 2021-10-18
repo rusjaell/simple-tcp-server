@@ -24,8 +24,8 @@ namespace Solution
             var header = new byte[5];
             _ = socket.Receive(header, 0, 5, SocketFlags.None);
             
-            OperationCode = header[4];
-            var payloadSize = BitConverter.ToInt32(header, 0) - 1;
+            OperationCode = header[0];
+            var payloadSize = BitConverter.ToInt32(header, 1);
             
             Buffer = new byte[payloadSize];
 

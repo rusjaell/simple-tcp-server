@@ -15,6 +15,8 @@ namespace Solution
             Id = id;
             Buffer = new List<byte>();
             Length = 0;
+
+            Buffer.Add(Id);
         }
 
         public void WriteByte(byte value)
@@ -106,12 +108,11 @@ namespace Solution
 
         public byte[] GetBuffer()
         {
-            // 4 bytes
             // 1 byte
+            // 4 bytes
             // N bytes
 
-            Buffer.InsertRange(0, BitConverter.GetBytes(Length + 1));
-            Buffer.Insert(4, Id);
+            Buffer.InsertRange(1, BitConverter.GetBytes(Length));
             return Buffer.ToArray();
         }
 
