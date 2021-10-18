@@ -4,7 +4,7 @@ using System.Net.Sockets;
 
 namespace Solution
 {
-    public struct Session
+    public sealed class Session
     {
         public readonly int Id;
         public readonly Socket Socket;
@@ -20,12 +20,31 @@ namespace Solution
             PendingOperations = new Queue<IncomingOperation>();
         }
 
-        public void Receive()
+        public bool IsConnected()
         {
             try
             {
-                if (Socket.Available >= 4) 
+                return !(Socket.Poll(1, SelectMode.SelectRead) && Socket.Available == 0);
+            }
+            catch (SocketException)
+            {
+                return false;
+            }
+        }
+
+        public void Receive()
+        {
+            if (!IsConnected())
+            {
+                Disconnect("Socket not connected");
+                return;
+            }
+
+            try
+            {
+                if (Socket.Available >= 4)
                 {
+                    Console.WriteLine(Socket.Available);
                     var incomingOperation = new IncomingOperation(this);
                     incomingOperation.ReceiveFromSocket(Socket);
 

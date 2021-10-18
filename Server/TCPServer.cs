@@ -57,6 +57,7 @@ namespace Solution
                 session.HandleOperations();
             }
         }
+
         public void ProcessDisconnected()
         {
             var sessionsToRemove = Sessions.Where(_ => _.Value.Disconnected).Select(_ => _.Key).ToList();
