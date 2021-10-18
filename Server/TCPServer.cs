@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
@@ -12,6 +13,14 @@ namespace Solution
         private Dictionary<int, Session> Sessions = new Dictionary<int, Session>();
 
         private Socket Socket;
+        
+        private int Handled;
+
+        public void Metrics()
+        {
+            Console.WriteLine($"Handling: {Handled} last tick");
+            Handled = 0;
+        }
 
         public TCPServer(int port, int backlog)
         {
@@ -54,7 +63,7 @@ namespace Solution
         {
             foreach (var session in Sessions.Values)
             {
-                session.HandleOperations();
+                session.HandleOperations(ref Handled);
             }
         }
 

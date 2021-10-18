@@ -9,29 +9,26 @@ namespace Solution
         {
             var client = new TCPClient(2050);
 
-            var packet = new OutgoingOperation(0);
-            packet.WriteByte(32);
-            packet.WriteByte(96);
-            client.Send(ref packet);
+            while (true)
+            {
+                var packet = new OutgoingOperation(0);
+                packet.WriteByte(32);
+                packet.WriteByte(96);
+                client.Send(ref packet);
 
-            Thread.Sleep(1000);
+                packet = new OutgoingOperation(1);
+                packet.WriteFloat(5.0f);
+                packet.WriteByte(32);
+                client.Send(ref packet);
 
-            packet = new OutgoingOperation(1);
-            packet.WriteFloat(5.0f);
-            packet.WriteByte(32);
-            client.Send(ref packet);
-
-            Thread.Sleep(1000);
-            
-            packet = new OutgoingOperation(2);
-            packet.WriteUTF16("Test Message");
-            packet.WriteByte(5);
-            client.Send(ref packet);
-
-            Thread.Sleep(1000);
-
-
-            Thread.Sleep(10000);
+                packet = new OutgoingOperation(2);
+                packet.WriteUTF16("Test Message");
+                packet.WriteByte(5);
+                client.Send(ref packet);
+             
+                Thread.Sleep(16); // 60 client fps (if it was a game)
+            }
+            client.Close();
         }
     }
 }

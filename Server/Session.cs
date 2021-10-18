@@ -42,9 +42,8 @@ namespace Solution
 
             try
             {
-                if (Socket.Available >= 4)
+                while (Socket.Available >= 4)
                 {
-                    Console.WriteLine(Socket.Available);
                     var incomingOperation = new IncomingOperation(this);
                     incomingOperation.ReceiveFromSocket(Socket);
 
@@ -58,24 +57,25 @@ namespace Solution
             }
         }
 
-        public void HandleOperations()
+        public void HandleOperations(ref int handled)
         {
             while(PendingOperations.Count > 0)
             {
                 var operation = PendingOperations.Dequeue();
 
-                switch (operation.OperationCode)
-                {
-                    case 0:
-                        Console.WriteLine("Operation 0 | " + operation.ReadByte() + " " + operation.ReadByte());
-                        break;
-                    case 1:
-                        Console.WriteLine("Operation 1 | " + operation.ReadFloat() + " " + operation.ReadByte());
-                        break;
-                    case 2:
-                        Console.WriteLine("Operation 2 | " + operation.ReadUTF16() + " " + operation.ReadByte());
-                        break;
-                }
+                //switch (operation.OperationCode)
+                //{
+                //    case 0:
+                //        Console.WriteLine("Operation 0 | " + operation.ReadByte() + " " + operation.ReadByte());
+                //        break;
+                //    case 1:
+                //        Console.WriteLine("Operation 1 | " + operation.ReadFloat() + " " + operation.ReadByte());
+                //        break;
+                //    case 2:
+                //        Console.WriteLine("Operation 2 | " + operation.ReadUTF16() + " " + operation.ReadByte());
+                //        break;
+                //}
+                handled++;
             }
         }
 
