@@ -11,6 +11,7 @@ namespace Solution
     {
         private int NextSessionId;
         private Dictionary<int, Session> Sessions = new Dictionary<int, Session>();
+        private object SessionLock = new object();
 
         private Socket Socket;
         
@@ -30,13 +31,15 @@ namespace Solution
 
             Socket.Bind(endpoint);
             Socket.Listen(backlog);
+
+            Socket.BeginAccept(ProcessAccepting, null);
         }
 
-        public void ProcessAccepting()
+        public void ProcessAccepting(IAsyncResult ar)
         {
             try
             {
-                var socket = Socket.Accept();
+                var socket = Socket.EndAccept(ar);
                 if (socket == null)
                 {
                     Console.WriteLine("Invalid Socket");
@@ -44,34 +47,50 @@ namespace Solution
                 }
 
                 NextSessionId++;
-                Sessions.Add(NextSessionId, new Session(NextSessionId, socket));
+                lock (SessionLock)
+                {
+                    Sessions.Add(NextSessionId, new Session(NextSessionId, socket));
+                }
             }
             catch
             {
             }
+            Socket.BeginAccept(ProcessAccepting, null);
         }
 
         public void ProcessReceive()
         {
-            foreach (var session in Sessions.Values)
+            lock (SessionLock)
             {
-                session.Receive();
+                foreach (var session in Sessions.Values)
+                {
+                    session.Receive();
+                }
             }
         }
 
         public void ProcessOperations()
         {
-            foreach (var session in Sessions.Values)
+            lock (SessionLock)
             {
-                session.HandleOperations(ref Handled);
+                foreach (var session in Sessions.Values)
+                {
+                    session.HandleOperations(ref Handled);
+                }
             }
         }
 
         public void ProcessDisconnected()
         {
-            var sessionsToRemove = Sessions.Where(_ => _.Value.Disconnected).Select(_ => _.Key).ToList();
-            foreach (var id in sessionsToRemove)
-                _ = Sessions.Remove(id);
+            lock (SessionLock)
+            {
+                var sessionsToRemove = new List<int>();
+                foreach (var session in Sessions.Values)
+                    if (session.Disconnected)
+                        sessionsToRemove.Add(session.Id);
+                foreach (var id in sessionsToRemove)
+                    _ = Sessions.Remove(id);
+            }
         }
     }
 }
