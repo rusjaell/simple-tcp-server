@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Net;
 using System.Net.Sockets;
 
-namespace Solution
+namespace Solution.Net
 {
     public sealed class TCPServer
     {

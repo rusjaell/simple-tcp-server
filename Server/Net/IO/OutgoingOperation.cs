@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Solution
+namespace Solution.Net.IO
 {
     public struct OutgoingOperation
     {

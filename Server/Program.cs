@@ -4,6 +4,9 @@ using System.Net;
 using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
+using Solution.Net;
+using Solution.Net.IO;
+using Solution.Utils;
 
 namespace Solution
 {
@@ -27,8 +30,8 @@ namespace Solution
 
             var watch = Stopwatch.StartNew();
 
-            var tps = 50;
-            var sleep = tps;
+            var millisecondsPerTick = 50;
+            var sleep = millisecondsPerTick;
 
             var lastMS = 0L;
             var mre = new ManualResetEvent(false);
@@ -40,7 +43,7 @@ namespace Solution
 
                 var currentMS = watch.ElapsedMilliseconds;
 
-                var dt = (int)Math.Max(currentMS - lastMS, tps);
+                var dt = (int)Math.Max(currentMS - lastMS, millisecondsPerTick);
 
                 var logicStartTime = watch.ElapsedMilliseconds;
 
@@ -53,8 +56,7 @@ namespace Solution
                 
                 // server logic end
 
-
-                sleep = tps - (int)(watch.ElapsedMilliseconds - logicStartTime);
+                sleep = millisecondsPerTick - (int)(watch.ElapsedMilliseconds - logicStartTime);
 
                 lastMS = currentMS;
             }

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 
-namespace Solution
+namespace Solution.Utils
 {
     public sealed class TimedProfiler : IDisposable
     {
