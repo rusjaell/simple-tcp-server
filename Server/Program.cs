@@ -7,26 +7,6 @@ using System.Threading.Tasks;
 
 namespace Solution
 {
-    public sealed class TimedProfiler : IDisposable
-    {
-        private string Message { get; }
-        private Stopwatch Stopwatch { get; }
-
-        public TimedProfiler(string message)
-        {
-            Message = message;
-            Stopwatch = Stopwatch.StartNew();
-        }
-
-        public void Dispose()
-        {
-            Stopwatch.Stop();
-            var time = Stopwatch.Elapsed;
-            var ms = Stopwatch.ElapsedMilliseconds;
-            Console.WriteLine($"{Message} - Elapsed: {time} ({ms}ms)");
-        }
-    }
-
     public sealed class Program
     {
         public static void Main()
@@ -35,17 +15,48 @@ namespace Solution
 
             // todo make this multi threaded
 
+            for (var i = 0; i < 1; i++)
+            {
+                var process = new Process();
+                process.StartInfo.FileName = "../../Client/Debug/Client.exe";
+                process.StartInfo.RedirectStandardOutput = true;
+                process.StartInfo.UseShellExecute = false;
+                process.StartInfo.CreateNoWindow = true;
+                process.Start();
+            }
+
+            var watch = Stopwatch.StartNew();
+
+            var tps = 50;
+            var sleep = tps;
+
+            var lastMS = 0L;
+            var mre = new ManualResetEvent(false);
+
             while (true)
             {
-                Console.WriteLine("============================================================================");
-                using (var timedProfiler = new TimedProfiler("Metrics"))
-                    server.Metrics();
-                using (var timedProfiler = new TimedProfiler("ProcessReceive"))
-                    server.ProcessReceive();
-                using (var timedProfiler = new TimedProfiler("ProcessOperations"))
-                    server.ProcessOperations();
-                using (var timedProfiler = new TimedProfiler("ProcessDisconnected"))
-                    server.ProcessDisconnected();
+                if (sleep > 0)
+                    _ = mre.WaitOne(sleep);
+
+                var currentMS = watch.ElapsedMilliseconds;
+
+                var dt = (int)Math.Max(currentMS - lastMS, tps);
+
+                var logicStartTime = watch.ElapsedMilliseconds;
+
+                // server logic start
+
+                server.ProcessMetrics();
+                server.ProcessOperations();
+                server.ProcessDisconnected();
+                server.ProcessLogic(dt);
+                
+                // server logic end
+
+
+                sleep = tps - (int)(watch.ElapsedMilliseconds - logicStartTime);
+
+                lastMS = currentMS;
             }
         }
     }

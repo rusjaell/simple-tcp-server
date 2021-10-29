@@ -11,25 +11,12 @@ namespace Solution
         public int Position;
         public Session Session;
 
-        public IncomingOperation(Session session)
+        public IncomingOperation(Session session, byte opCode, byte[] buffer)
         {
-            OperationCode = 0;
-            Buffer = null;
+            OperationCode = opCode;
+            Buffer = buffer;
             Position = 0;
             Session = session;
-        }
-
-        public void ReceiveFromSocket(Socket socket)
-        {
-            var header = new byte[5];
-            _ = socket.Receive(header, 0, 5, SocketFlags.None);
-            
-            OperationCode = header[0];
-            var payloadSize = BitConverter.ToInt32(header, 1);
-            
-            Buffer = new byte[payloadSize];
-
-            _ = socket.Receive(Buffer, 0, Buffer.Length, SocketFlags.None);
         }
 
         public void Log(int bytes)

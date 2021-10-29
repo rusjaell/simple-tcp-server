@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 
@@ -17,9 +15,9 @@ namespace Solution
         
         private int Handled;
 
-        public void Metrics()
+        public void ProcessMetrics()
         {
-            Console.WriteLine($"Handling: {Handled} last tick");
+            Console.Title = $"Handling: {Handled} every tick - {Sessions.Count} Sessions";
             Handled = 0;
         }
 
@@ -32,7 +30,7 @@ namespace Solution
             Socket.Bind(endpoint);
             Socket.Listen(backlog);
 
-            Socket.BeginAccept(ProcessAccepting, null);
+            _ = Socket.BeginAccept(ProcessAccepting, null);
         }
 
         public void ProcessAccepting(IAsyncResult ar)
@@ -48,25 +46,17 @@ namespace Solution
 
                 NextSessionId++;
                 lock (SessionLock)
-                {
-                    Sessions.Add(NextSessionId, new Session(NextSessionId, socket));
+                { 
+                    var session = new Session(NextSessionId, socket);
+                    session.Start();
+                    Sessions.Add(NextSessionId, session);
                 }
             }
             catch
             {
             }
-            Socket.BeginAccept(ProcessAccepting, null);
-        }
 
-        public void ProcessReceive()
-        {
-            lock (SessionLock)
-            {
-                foreach (var session in Sessions.Values)
-                {
-                    session.Receive();
-                }
-            }
+            _ = Socket.BeginAccept(ProcessAccepting, null);
         }
 
         public void ProcessOperations()
@@ -91,6 +81,11 @@ namespace Solution
                 foreach (var id in sessionsToRemove)
                     _ = Sessions.Remove(id);
             }
+        }
+
+        public void ProcessLogic(double dt)
+        {
+            // todo whatver server needs
         }
     }
 }
