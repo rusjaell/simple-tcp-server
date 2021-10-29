@@ -29,7 +29,10 @@ namespace Solution.Net
 
             Socket.Bind(endpoint);
             Socket.Listen(backlog);
+        }
 
+        public void Start()
+        {
             _ = Socket.BeginAccept(ProcessAccepting, null);
         }
 
@@ -56,7 +59,7 @@ namespace Solution.Net
             {
             }
 
-            _ = Socket.BeginAccept(ProcessAccepting, null);
+            Start();
         }
 
         public void ProcessOperations()
