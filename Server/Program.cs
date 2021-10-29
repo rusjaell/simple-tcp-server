@@ -7,7 +7,7 @@ namespace Solution
         public static void Main()
         {
             var core = new Core(2050, 0xFF);
-            core.Run();
+            core.Run(1);
             core.Shutdown();
         }
     }

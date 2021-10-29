@@ -14,19 +14,19 @@ namespace Server.Core
             TCPServer = new TCPServer(port, backLog);
         }
 
-        public void Run()
+        public void Run(int clients = 0)
         {
             TCPServer.Start();
 
-            RunClients();
+            RunClients(clients);
             RunLoop();
         }
 
-        private void RunClients()
+        private void RunClients(int clients)
         {
             // todo make this multi threaded
 
-            for (var i = 0; i < 1; i++)
+            for (var i = 0; i < clients; i++)
             {
                 var process = new Process();
                 process.StartInfo.FileName = "../../Client/Debug/Client.exe";
