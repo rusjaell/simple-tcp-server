@@ -24,12 +24,15 @@ namespace Server.Core
 
         private void RunClients(int clients)
         {
-            // todo make this multi threaded
-
             for (var i = 0; i < clients; i++)
             {
                 var process = new Process();
+#if DEBUG
                 process.StartInfo.FileName = "../../Client/Debug/Client.exe";
+#else
+                process.StartInfo.FileName = "Client.exe";
+#endif
+
                 process.StartInfo.RedirectStandardOutput = true;
                 process.StartInfo.UseShellExecute = false;
                 process.StartInfo.CreateNoWindow = true;

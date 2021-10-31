@@ -1,8 +1,8 @@
 # simple-tcp-server
 
-A simple TCP Socket that utilizes structured commands
+A simple TCP Socket that utilizes structured operations
 
-A Command Header is structures as following: 
+A Operation Header is structured as following: 
 
 * 1 byte (Operation Code)
 * 4 byte (Payload Size)
